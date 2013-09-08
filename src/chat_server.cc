@@ -10,7 +10,6 @@ Junegunn Choi (junegunn.c@gmail.com)
 #include "util.h"
 
 using namespace std;
-using namespace boost;
 
 template<class Server, class Stream>
 class ChatHandler
