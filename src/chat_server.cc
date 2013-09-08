@@ -10,6 +10,7 @@ Junegunn Choi (junegunn.c@gmail.com)
 #include "util.h"
 
 using namespace std;
+using namespace boost;
 
 template<class Server, class Stream>
 class ChatHandler
@@ -39,11 +40,13 @@ public:
 
 private:
   void publish(Stream* self, const ostringstream& data) {
+    const string& msg(data.str());
+
     // http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
     for (Stream* stream : static_cast<Server*>(this)->streams()) {
       if (stream != self) {
-        stream->write(data.str().c_str(), data.str().size());
-        stream->write("\n", 1);
+        stream->write(msg.c_str(), msg.size());
+        stream->write("\r\n", 2);
       }
     }
   }
@@ -54,8 +57,9 @@ private:
 
 int main(int argc, char *argv[]) {
   int port = argc > 1 ? jg::util::from_string<int>(argv[1]) : 8000;
+
   jg::evented::Server<
-    jg::evented::DelimiterParser<'\n'>,
+    jg::evented::DelimiterParser<STATIC_STRING('\r', '\n')::value>,
     ChatHandler,
     1024
   > server(port);

@@ -11,7 +11,7 @@ cnt  = 0
 unit = 10000
 st   = Time.now
 while true
-  socket.puts "hello #{cnt += 1}!"
+  socket.print "hello #{cnt += 1}!\r\n"
   if cnt % unit == 0
     print "\rputs/sec: #{unit / (Time.now - st)}"
     st = Time.now

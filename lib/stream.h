@@ -7,6 +7,7 @@ Junegunn Choi (junegunn.c@gmail.com)
 #define __jg_evented_stream__
 
 #include <vector>
+#include <sstream>
 #include <functional>
 #include <ev++.h>
 #include <fcntl.h>
@@ -47,6 +48,11 @@ public:
   virtual ~Stream() {
     watcher.stop();
     shutdown(watcher.fd, SHUT_RDWR);
+  }
+
+  void write(const std::ostringstream& stream) {
+    const std::string& str(stream.str());
+    write(str.c_str(), str.size());
   }
 
   void write(const char* buffer, int sz) {
