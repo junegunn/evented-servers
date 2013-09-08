@@ -15,7 +15,7 @@ AddrInfo::AddrInfo(int port) {
   hints.ai_socktype = SOCK_STREAM; // TCP
   hints.ai_flags    = AI_PASSIVE;  // socket address structure for bind(2)
 
-  if (getaddrinfo(NULL, util::to_string(port).c_str(), &hints, &info_) != 0) {
+  if (getaddrinfo(nullptr, util::to_string(port).c_str(), &hints, &info_) != 0) {
     throw Exception("getaddrinfo");
   }
 
@@ -28,7 +28,7 @@ AddrInfo::~AddrInfo() {
 
 void AddrInfo::print(ostream& out) {
   struct addrinfo* ptr;
-  for (ptr = info_; ptr != NULL; ptr = ptr->ai_next) {
+  for (ptr = info_; ptr != nullptr; ptr = ptr->ai_next) {
     bool  ipv4 = ptr->ai_family == AF_INET;
     void* addr;
     char  ipstr[INET6_ADDRSTRLEN];
