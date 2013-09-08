@@ -3,7 +3,6 @@ Junegunn Choi (junegunn.c@gmail.com)
 # 2013/09/08-
 */
 
-#include <boost/foreach.hpp>
 #include <map>
 #include <sstream>
 #include "server.h"
@@ -41,7 +40,7 @@ public:
 private:
   void publish(Stream* self, const ostringstream& data) {
     // http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
-    BOOST_FOREACH(Stream* stream, static_cast<Server*>(this)->streams()) {
+    for (Stream* stream : static_cast<Server*>(this)->streams()) {
       if (stream != self) {
         stream->write(data.str().c_str(), data.str().size());
         stream->write("\n", 1);
