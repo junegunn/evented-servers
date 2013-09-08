@@ -29,7 +29,7 @@ namespace evented {
 
 // CRTP
 template<class Parser, template<class, class> class Handler, int buf_sz>
-class Server : public Handler<Server<Parser, Handler, buf_sz>, Stream<Parser, buf_sz> > {
+class Server : public Handler<Server<Parser, Handler, buf_sz>, Stream<Parser, buf_sz>> {
 public:
   typedef Stream<Parser, buf_sz> Stream;
 
