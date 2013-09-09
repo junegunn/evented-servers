@@ -1,7 +1,7 @@
 evented-servers
 ===============
 
-A little experiments with libev.
+Small network services built with libev.
 
 Prerequisites
 -------------
