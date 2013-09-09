@@ -31,7 +31,7 @@ namespace evented {
 template<class Parser, template<class, class> class Handler, int buf_sz>
 class Server : public Handler<Server<Parser, Handler, buf_sz>, Stream<Parser, buf_sz>> {
 public:
-  typedef Stream<Parser, buf_sz> Stream;
+  typedef Stream<Parser, buf_sz> ClientStream;
 
   Server(int listen_port) : port(listen_port) {
     unsigned int supported = ev::supported_backends();
@@ -54,7 +54,7 @@ public:
     loop.run();
   }
 
-  const std::unordered_set<Stream*>& streams() {
+  const std::unordered_set<ClientStream*>& streams() {
     return streams_;
   }
 
@@ -65,7 +65,7 @@ private:
     socklen_t addr_len = sizeof(caddr);
     int client = accept(watcher.fd, (struct sockaddr*) &caddr, &addr_len);
 
-    Stream* stream = new Stream(
+    ClientStream* stream = new ClientStream(
         client,
         std::bind(&Server::on_data, this, _1, _2, _3),
         std::bind(&Server::close_stream, this, _1));
@@ -80,7 +80,7 @@ private:
     watcher.loop.break_loop();
   }
 
-  void close_stream(Stream* stream) {
+  void close_stream(ClientStream* stream) {
     this->on_close(stream);
     delete stream;
     streams_.erase(stream);
@@ -112,11 +112,11 @@ private:
     signal_watcher.start(SIGINT);
   }
 
-  ev::default_loop            loop;
-  ev::io                      listener;
-  ev::sig                     signal_watcher;
-  std::unordered_set<Stream*> streams_;
-  int                         port;
+  ev::default_loop                  loop;
+  ev::io                            listener;
+  ev::sig                           signal_watcher;
+  std::unordered_set<ClientStream*> streams_;
+  int                               port;
 };
 
 //---------------------------------------------------------

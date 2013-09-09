@@ -34,7 +34,7 @@ void DelimiterParser<delimiter>::feed(char* buffer, int bufsz) {
   int pos = 0;
   int len = strlen(delimiter);
   for (int i = 0; i <= bufsz - len; ++i) {
-    if (strnstr(buffer + i, delimiter, len) != nullptr) {
+    if (strncmp(buffer + i, delimiter, len) == 0) {
       leftover.insert(leftover.end(), buffer + pos, buffer + i);
       callback(&leftover[0], leftover.size());
       leftover.resize(0);
