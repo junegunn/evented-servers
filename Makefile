@@ -6,13 +6,18 @@ BIN      = $(addprefix $(BINDIR)/, $(notdir $(basename $(wildcard src/*.cc))))
 
 SRC      = $(wildcard lib/*.cc)
 HEADERS  = $(wildcard lib/*.h)
-CFLAGS   = -O2 -Wall -std=c++11 -stdlib=libc++
 INCLUDE  = lib
 
 #-------------------------------------------------
 # Compiler options -------------------------------
 
+ifeq ($(MAKECMDGOALS), gcc)
+CC       = g++
+CFLAGS   = -O2 -Wall -std=c++11
+else
 CC       = clang++
+CFLAGS   = -O2 -Wall -std=c++11 -stdlib=libc++
+endif
 CFLAGS  += $(addprefix -I, $(INCLUDE)) -fPIC
 LFLAGS   = -lev
 OBJ      = $(addprefix $(OBJDIR)/, $(notdir $(SRC:.cc=.o)))
@@ -20,7 +25,12 @@ OBJDIR   = obj
 
 # Build ------------------------------------------
 
-all: $(BIN)
+error:
+	@echo "make gcc|clang|clean"
+	@exit 1
+
+clang: $(BIN)
+gcc: $(BIN)
 
 # targets: normal-prerequisites | order-only-prerequisites
 $(OBJ): | $(OBJDIR)
