@@ -34,10 +34,13 @@ public:
   typedef Stream<Parser, buf_sz> ClientStream;
 
   Server(int listen_port) : port(listen_port) {
-    unsigned int supported = ev::supported_backends();
+    unsigned int supported   = ev::supported_backends();
     unsigned int recommended = ev::recommended_backends();
+    unsigned int chosen      = loop.backend();
     #define INFO(TYPE) \
-      DEBUG(#TYPE << " " << ((supported & ev::TYPE) > 0) << " -> " << ((recommended & ev::TYPE) > 0))
+      DEBUG(#TYPE << " " << ((supported & ev::TYPE) > 0) \
+                  << " -> " << ((recommended & ev::TYPE) > 0) \
+                  << " -> " << ((chosen & ev::TYPE)> 0))
     INFO(SELECT);
     INFO(POLL);
     INFO(EPOLL);
