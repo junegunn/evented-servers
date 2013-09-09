@@ -39,7 +39,10 @@ public:
 
     // Ignore SIGPIPE
     // http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#The_special_problem_of_SIGPIPE
+    // http://stackoverflow.com/questions/108183/how-to-prevent-sigpipes-or-handle-them-properly
+#ifdef __APPLE__
     fcntl(client_socket, F_SETNOSIGPIPE, 1);
+#endif
 
     watcher.set<Stream, &Stream::callback>(this);
     watcher.start(client_socket, ev::READ);
@@ -97,7 +100,11 @@ private:
   }
 
   bool handle_write() {
+#ifdef __APPLE__
     int written_bytes = send(watcher.fd, &write_buffer[0], write_buffer.size(), 0);
+#else
+    int written_bytes = send(watcher.fd, &write_buffer[0], write_buffer.size(), MSG_NOSIGNAL);
+#endif
     if (written_bytes == -1) {
       DEBUG("send error");
       close_callback(this);
