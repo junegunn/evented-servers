@@ -1,6 +1,8 @@
 # Junegunn Choi (junegunn.c@gmail.com)
 # 2013/09/03-
 
+VERSION  = 0.0.1
+
 BINDIR   = bin
 BIN      = $(addprefix $(BINDIR)/, $(notdir $(basename $(wildcard src/*.cc))))
 
@@ -11,22 +13,26 @@ INCLUDE  = lib
 #-------------------------------------------------
 # Compiler options -------------------------------
 
-ifeq ($(MAKECMDGOALS), gcc)
 CC       = g++
-CFLAGS   = -O2 -Wall -std=c++11
-else
+CFLAGS   = -O2 -Wall -DVERSION='"$(VERSION)"' -std=c++11
+ifeq ($(MAKECMDGOALS), clang)
 CC       = clang++
-CFLAGS   = -O2 -Wall -std=c++11 -stdlib=libc++
+CFLAGS  += -stdlib=libc++
 endif
 CFLAGS  += $(addprefix -I, $(INCLUDE)) -fPIC
+
 LFLAGS   = -lev
+ifeq ($(static), 1)
+LFLAGS  += -static
+endif
+
 OBJ      = $(addprefix $(OBJDIR)/, $(notdir $(SRC:.cc=.o)))
 OBJDIR   = obj
 
 # Build ------------------------------------------
 
 error:
-	@echo "make gcc|clang|clean"
+	@echo "make gcc|clang|clean [static=1]"
 	@exit 1
 
 clang: $(BIN)

@@ -34,6 +34,8 @@ public:
   typedef Stream<Parser, buf_sz> ClientStream;
 
   Server(int listen_port) : port(listen_port) {
+    DEBUG("evented-servers " << VERSION);
+
     unsigned int supported   = ev::supported_backends();
     unsigned int recommended = ev::recommended_backends();
     unsigned int chosen      = loop.backend();
