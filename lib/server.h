@@ -14,6 +14,8 @@ Junegunn Choi (junegunn.c@gmail.com)
 #define __jg_evented_server__
 
 #include <unordered_set>
+#include <unordered_map>
+#include <memory> // std::shared_ptr
 #include <functional>
 #include <ev++.h>
 #include "addr_info.h"
@@ -32,6 +34,7 @@ template<class Parser, template<class, class> class Handler, int buf_sz>
 class Server : public Handler<Server<Parser, Handler, buf_sz>, Stream<Parser, buf_sz>> {
 public:
   typedef Stream<Parser, buf_sz> ClientStream;
+  typedef std::function<void(void)> Callback;
 
   Server(int listen_port) : port(listen_port) {
     DEBUG("evented-servers " << VERSION);
@@ -49,8 +52,14 @@ public:
     INFO(KQUEUE);
     #undef INFO
   }
+
   virtual ~Server() {
     shutdown(listener.fd, SHUT_RDWR);
+    for (auto& pair : timers) {
+      pair.first->stop();
+      delete pair.first;
+      delete pair.second;
+    }
   }
 
   void start() {
@@ -59,11 +68,43 @@ public:
     loop.run();
   }
 
+  void set_timeout(const ev::tstamp& t, const Callback& callback) {
+    set_timer<&Server::timeout>(t, callback);
+  }
+
+  void set_interval(const ev::tstamp& t, const Callback& callback) {
+    set_timer<&Server::interval>(t, callback);
+  }
+
   const std::unordered_set<ClientStream*>& streams() {
     return streams_;
   }
 
 private:
+  template<void (Server::*method)(ev::timer&, int)>
+  void set_timer(const ev::tstamp& t, const Callback& callback) {
+    ev::timer* timer        = new ev::timer;
+    Callback*  callback_ptr = new Callback(callback);
+
+    timers[timer] = callback_ptr;
+    timer->set<Server, method>(this);
+    timer->start(t, t);
+  }
+
+  void timeout(ev::timer& timer, int revents) {
+    timer.stop();
+    Callback* cb = timers[&timer];
+    (*cb)();
+    delete timers[&timer];
+    timers.erase(&timer);
+    delete &timer;
+  }
+
+  void interval(ev::timer& timer, int revents) {
+    Callback* cb = timers[&timer];
+    (*cb)();
+  }
+
   void io_accept(ev::io& watcher, int revents) {
     // Designed to be large enough to hold both IPv4 and IPv6 structures
     struct sockaddr_storage caddr;
@@ -117,11 +158,12 @@ private:
     signal_watcher.start(SIGINT);
   }
 
-  ev::default_loop                  loop;
-  ev::io                            listener;
-  ev::sig                           signal_watcher;
-  std::unordered_set<ClientStream*> streams_;
-  int                               port;
+  ev::default_loop                          loop;
+  ev::io                                    listener;
+  ev::sig                                   signal_watcher;
+  std::unordered_map<ev::timer*, Callback*> timers;
+  std::unordered_set<ClientStream*>         streams_;
+  int                                       port;
 };
 
 //---------------------------------------------------------
