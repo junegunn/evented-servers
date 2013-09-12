@@ -1,3 +1,6 @@
+#ifndef __jg_handler__
+#define __jg_handler__
+
 //---------------------------------------------------------
 namespace jg {
 namespace evented {
@@ -17,3 +20,5 @@ public:
 } // end of namespace evented
 } // end of namespace jg
 //---------------------------------------------------------
+
+#endif
