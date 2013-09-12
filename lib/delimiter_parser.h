@@ -8,7 +8,7 @@
 #include "util.h"
 
 #define STATIC_STRING(...) \
-  boost::mpl::c_str< boost::mpl::string<__VA_ARGS__> >
+  boost::mpl::c_str< boost::mpl::string<__VA_ARGS__> >::value
 //---------------------------------------------------------
 namespace jg {
 namespace evented {
@@ -48,7 +48,7 @@ void DelimiterParser<delimiter>::feed(char* buffer, int bufsz) {
   }
 }
 
-typedef DelimiterParser<STATIC_STRING('\r', '\n')::value> CRLFParser;
+typedef DelimiterParser<STATIC_STRING('\r', '\n')> CRLFParser;
 //---------------------------------------------------------
 } // end of namespace evented
 } // end of namespace jg

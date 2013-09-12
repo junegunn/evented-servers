@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   int port = argc > 1 ? jg::util::from_string<int>(argv[1]) : 8000;
 
   jg::evented::Server<
-    jg::evented::DelimiterParser<STATIC_STRING('\r', '\n')::value>,
+    jg::evented::DelimiterParser<STATIC_STRING('\r', '\n')>,
     ChatHandler,
     1024
   > server(port);
