@@ -14,7 +14,7 @@ template<class Server, class Stream>
 class SeqHandler
 {
 public:
-  SeqHandler() : counter(0) {}
+  SeqHandler() : counter(0), prev_counter(0) {}
   void on_open(Stream* stream) {}
   void on_close(Stream* stream) {}
   void on_data(Stream* stream, const char* data, int size) {
@@ -35,8 +35,16 @@ public:
 
     stream->write(os);
   }
+
+  void print_stats(int interval) {
+    if (counter > prev_counter)
+      DEBUG((counter - prev_counter) / interval << " incr/sec");
+    prev_counter = counter;
+  }
+
 private:
   long long int counter;
+  long long int prev_counter;
 };
 
 int main(int argc, char *argv[]) {
@@ -46,6 +54,7 @@ int main(int argc, char *argv[]) {
     SeqHandler,
     1024
   > server(port);
+  server.set_interval(10, [&server]() { server.print_stats(10); });
   server.start();
 
   return 0;
