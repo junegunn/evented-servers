@@ -22,3 +22,7 @@ Build
     # GCC, static linking
     make gcc static=1
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/junegunn/evented-servers/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
