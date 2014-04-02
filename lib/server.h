@@ -133,7 +133,7 @@ private:
   }
 
   void ready(int port) {
-    AddrInfo addr(8000);
+    AddrInfo addr(port);
 
     // Create socket
     int fd;
